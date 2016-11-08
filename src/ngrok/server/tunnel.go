@@ -165,7 +165,16 @@ func NewTunnel(m *msg.ReqTunnel, ctl *Control) (t *Tunnel, err error) {
 			return
 		}
 
-		if err = registerVhost(t, proto, l.Addr.(*net.TCPAddr).Port); err != nil {
+		var vhostPort int
+		if opts.srcHttpAddr != "" && proto == "http" {
+			vhostPort, _ = strconv.Atoi(opts.srcHttpAddr[1:])
+		} else if opts.srcHttpsAddr != "" && proto == "https" {
+			vhostPort, _ = strconv.Atoi(opts.srcHttpsAddr[1:])
+		} else {
+			vhostPort = l.Addr.(*net.TCPAddr).Port
+		}
+
+		if err = registerVhost(t, proto, vhostPort); err != nil {
 			return
 		}
 
